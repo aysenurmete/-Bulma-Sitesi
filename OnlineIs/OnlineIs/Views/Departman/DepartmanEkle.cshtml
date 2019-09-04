@@ -1,0 +1,30 @@
+﻿
+@{
+    ViewBag.Title = "DepartmanEkle";
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="block">
+            <div class="block-heading">
+                <div class="main-text h2">
+                    Departman Ekleme Sayfası
+                </div>
+            </div>
+            <div class="block-content-outer">
+                <div class="block-content-inner">
+                    <form role="form" action="/Departman/DepartmanEkle" method="post">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">
+                                Departman Adı
+                            </label>
+                            <input type="text" name="departmanADI" class="form-control" id="exampleInputEmail1" placeholder="Departman Adı Giriniz">
+                        </div>
+
+                        <button type="submit" class="btn btn-success">Kaydet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

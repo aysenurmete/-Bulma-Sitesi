@@ -1,0 +1,157 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@using OnlineIs.Models;
+
+@model List<SEHIR>
+
+
+@section body{
+
+
+    <div class="modal fade" id="UpdateScreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Şehir Güncelleme</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+
+                        <label style="font-weight:bold"> Şehir Adı </label>
+                        <input id="Sad" class="form-control" style="width:unset;" type="text" name="Ad" />
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">İptal</button>
+                    <button type="button" id="SGuncel" class="btn btn-danger SGuncelle" onclick="TakeVal();">Güncelle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="block">
+            <div class="block-heading">
+                <div class="main-text h2">
+                    Sehir Listesi
+                </div>
+                <div class="block-controls">
+
+                    <a href="/Sehir/SehirEkle" class="btn btn-success">Şehir Ekle</a>
+                </div>
+            </div>
+            <div class="block-content-outer">
+                <div class="block-content-inner">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+
+                                <th>Şehir Adı</th>
+                                <th>Güncelle</th>
+                                <th>Sil</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (SEHIR s in Model)
+                            {
+                            <tr>
+                                <td>@s.sehirADI</td>
+                                <td><button class="btn btn-primary GuncelmodalAc" data-toggle="modal" data-target="#UpdateScreen" data-shradi="@s.sehirADI" data-id="@s.sehirID">Güncelle </button></td>
+
+                                <td><a href="#" class="btn btn-success shrSil" data-shrid="@s.sehirID">Sil</a></td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/assets/js/required/jquery-1.11.1.min.js"></script>
+    <script>
+        $(".shrSil").click(function () {
+            var sonuc = confirm("Kayıt Silinsin mi?");
+            if (sonuc) {
+                var shrId = $(this).data("shrid");
+                //alert("Tamam'a basıldı");
+                $.ajax({
+                    type: "POST",
+                    url: "/Sehir/SehirSil/" + shrId,
+                    success: function () {
+                        alert("Kayıt Silindi");
+                        window.location.replace("/Sehir/Index");
+                    },
+                    error: function () {
+                        alert("Hata Oluştu");
+                    }
+                });
+            }
+            else {
+                alert("İptal'e basıldı");
+            }
+        });
+        
+
+
+         $(".GuncelmodalAc").click(function () {
+            var shrAdi = $(this).data("shradi");
+
+
+
+             $("#Sad").val(shrAdi);
+
+
+
+            var id = $(this).data("id");
+            var ad = $(this).data("shradi");
+
+
+
+            $(".SGuncelle").data("id", id);
+            $(".SGuncelle").data("shradi", ad);
+
+
+
+
+        });
+
+
+        function TakeVal()
+        {
+            var id = $('.SGuncelle').data("id");
+            var ad = $("#Sad").val();
+
+
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Guncelle", "Sehir")", //burada controllerdaki Guncelle kısmını geçiş yapıyorum.
+                data: { id: id, ad: ad },
+                success: function (durum) {
+                    if (durum == "guncellendi") {
+                        window.location.replace("/Sehir/Index");
+
+                    }
+                    else {
+                        $(".modal-body>p.hata").htm("Şehir güncelleme anında bir hata oluştu...");
+
+                    }
+                }
+
+            });
+        }
+    </script>
+}
+

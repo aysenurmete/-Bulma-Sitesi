@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@using OnlineIs.Models
+@model List<OKUL>
+
+@section body{
+
+
+    <div class="modal fade" id="UpdateScreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Okul Güncelleme</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+
+                        <label style="font-weight:bold"> Okul Adı </label>
+                        <input id="Oad" class="form-control" style="width:unset;" type="text" name="Ad" />
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">İptal</button>
+                    <button type="button" id="OGuncel" class="btn btn-danger OGuncelle" onclick="TakeVal();">Güncelle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="block">
+            <div class="block-heading">
+                <div class="main-text h2">
+                    Okul Listesi
+                </div>
+                <div class="block-controls">
+
+                    <a href="/Okul/OkulEkle" class="btn btn-success">Okul Ekle</a>
+                </div>
+            </div>
+            <div class="block-content-outer">
+                <div class="block-content-inner">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+
+                                <th>Okul Adı</th>
+                                <th>Güncelle</th>
+                                <th>Sil</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (OKUL o in Model)
+                            {
+                                <tr>
+                                    <td>@o.okulADI</td>
+                                    <td><button class="btn btn-primary GuncelmodalAc" data-toggle="modal" data-target="#UpdateScreen"
+                                                data-okuladi="@o.okulADI" data-id="@o.okulID">Güncelle </button></td>
+
+                                    <td><a href="#" class="btn btn-success okulSil" data-okulid="@o.okulID">Sil</a></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/assets/js/required/jquery-1.11.1.min.js"></script>
+    <script>
+        $(".okulSil").click(function () {
+            var sonuc = confirm("Kayıt Silinsin mi?");
+            if (sonuc) {
+                var okulId = $(this).data("okulid");
+                //alert("Tamam'a basıldı");
+                $.ajax({
+                    type: "POST",
+                    url: "/Okul/OkulSil/" + okulId,
+                    success: function () {
+                        alert("Kayıt Silindi");
+                        window.location.replace("/Okul/Index");
+                    },
+                    error: function () {
+                        alert("Hata Oluştu");
+                    }
+                });
+            }
+            else {
+                alert("İptal'e basıldı");
+            }
+        });        
+
+         $(".GuncelmodalAc").click(function () {
+            var okulAdi = $(this).data("okuladi");
+             $("#Oad").val(okulAdi);
+            var id = $(this).data("id");
+            var ad = $(this).data("okuladi");
+            $(".OGuncelle").data("id", id);
+            $(".OGuncelle").data("okuladi", ad);
+        });
+        function TakeVal()
+        {
+            var id = $('.OGuncelle').data("id");
+            var ad = $("#Oad").val();
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Guncelle", "Okul")", //burada controllerdaki Guncelle kısmını geçiş yapıyorum.
+                data: { id: id, ad: ad },
+                success: function (durum) {
+                    if (durum == "guncellendi") {
+                        window.location.replace("/Okul/Index");
+                    }
+                    else {
+                        $(".modal-body>p.hata").htm("Okul güncelleme anında bir hata oluştu...");
+                    }
+                }
+            });
+        }
+    </script>
+}

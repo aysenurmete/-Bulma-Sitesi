@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+@using OnlineIs.Models;
+
+@model List<EGITIMSEVIYESI>
+
+
+@section body{
+
+
+    <div class="modal fade" id="UpdateScreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">Eğitim Seviyesi Güncelleme</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+
+                        <label style="font-weight:bold"> Eğitim Seviyesi Adı </label>
+                        <input id="Ead" class="form-control" style="width:unset;" type="text" name="Ad" />
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">İptal</button>
+                    <button type="button" id="EGuncel" class="btn btn-danger EGuncelle" onclick="TakeVal();">Güncelle</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-md-12">
+        <div class="block">
+            <div class="block-heading">
+                <div class="main-text h2">
+                    Eğitim Seviyesi Listesi
+                </div>
+                <div class="block-controls">
+
+                    <a href="/EgitimSeviyesi/EgitimSeviyesiEkle" class="btn btn-success">Eğitim Seviyesi Ekle</a>
+                </div>
+            </div>
+            <div class="block-content-outer">
+                <div class="block-content-inner">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+
+                                <th>Eğitim Seviyesi Adı</th>
+                                <th>Güncelle</th>
+                                <th>Sil</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (EGITIMSEVIYESI e in Model)
+                            {
+                            <tr>
+                                <td>@e.egitimseviyeADI</td>
+                                <td><button class="btn btn-primary GuncelmodalAc" data-toggle="modal" data-target="#UpdateScreen" data-egtmadi="@e.egitimseviyeADI" data-id="@e.egitimseviyeID">Güncelle </button></td>
+
+                                <td><a href="#" class="btn btn-success egtmSil" data-egtmid="@e.egitimseviyeID">Sil</a></td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/assets/js/required/jquery-1.11.1.min.js"></script>
+    <script>
+        $(".egtmSil").click(function () {
+            var sonuc = confirm("Kayıt Silinsin mi?");
+            if (sonuc) {
+                var egtmId = $(this).data("egtmid");
+                //alert("Tamam'a basıldı");
+                $.ajax({
+                    type: "POST",
+                    url: "/EgitimSeviyesi/EgitimSeviyesiSil/" + egtmId,
+                    success: function () {
+                        alert("Kayıt Silindi");
+                        window.location.replace("/EgitimSeviyesi/Index");
+                    },
+                    error: function () {
+                        alert("Hata Oluştu");
+                    }
+                });
+            }
+            else {
+                alert("İptal'e basıldı");
+            }
+        });
+
+
+
+         $(".GuncelmodalAc").click(function () {
+            var egtmAdi = $(this).data("egtmadi");
+
+
+
+             $("#Ead").val(egtmAdi);
+
+
+
+            var id = $(this).data("id");
+            var ad = $(this).data("egtmadi");
+
+
+
+            $(".EGuncelle").data("id", id);
+            $(".EGuncelle").data("egtmadi", ad);
+
+
+
+
+        });
+
+
+        function TakeVal()
+        {
+            var id = $('.EGuncelle').data("id");
+            var ad = $("#Ead").val();
+
+
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Guncelle", "EgitimSeviyesi")", //burada controllerdaki Guncelle kısmını geçiş yapıyorum.
+                data: { id: id, ad: ad },
+                success: function (durum) {
+                    if (durum == "guncellendi") {
+                        window.location.replace("/EgitimSeviyesi/Index");
+
+                    }
+                    else {
+                        $(".modal-body>p.hata").htm("Eğitim Seviyesi güncelleme anında bir hata oluştu...");
+
+                    }
+                }
+
+            });
+        }
+
+    </script>
+}
+
+
